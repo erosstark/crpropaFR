@@ -15,7 +15,8 @@ namespace crpropa {
 struct Cosmology {
 	double H0; // Hubble parameter at z=0
 	double omegaM; // matter density parameter
-	double omegaL; // vacuum energy parameter
+    double R0;
+    double omegaR0;
 
 	static const int n;
 	static const double zmin;
@@ -34,11 +35,13 @@ struct Cosmology {
 
 		// Relation between comoving distance r and redshift z (cf. J.A. Peacock, Cosmological physics, p. 89 eq. 3.76)
 		// dr = c / H(z) dz, integration using midpoint rule
-		double dlz = log10(zmax) - log10(zmin);
-		for (int i = 1; i < n; i++) {
+		double dlz = log10(zmax) - log10(zmin); 
+		for (int i = 1; i < n; i++) { // ** n aqui é iterador entao esse parametro nao é o mesmo da eq**
 			Z[i] = zmin * pow(10, i * dlz / (n - 1)); // logarithmic even spacing
 			double dz = (Z[i] - Z[i - 1]); // redshift step
-			E[i] = sqrt(omegaL + omegaM * pow_integer<3>(1 + Z[i]));
+			E[i] = sqrt((-2 * n * R0 / (3 * pow(3 - n, 2) * omegaM)) *
+			            ((n - 3) * omegaM * pow(1 + Z[i], 3.0 / n) +
+			             2 * (n - 2) * omegaR0 * pow(1 + Z[i], (n + 3) / n)));
 			Dc[i] = Dc[i - 1] + dH * dz * (1 / E[i] + 1 / E[i - 1]) / 2;
 			Dl[i] = (1 + Z[i]) * Dc[i];
 			Dt[i] = Dt[i - 1]
@@ -50,9 +53,11 @@ struct Cosmology {
 
 	Cosmology() {
         // Cosmological parameters (K.A. Olive et al. (Particle Data Group), Chin. Phys. C, 38, 090001 (2014))
-		H0 = 67.3 * 1000 * meter / second / Mpc; // default values
+		H0 = 67.4 * 1000 * meter / second / Mpc; // default values
 		omegaM = 0.315;
-		omegaL = 1 - omegaM;
+        omegaR0 = 5.373*1e-5;
+		R0 = -(3 * pow(3 - n, 2) * pow(H0, 2) * omegaM / (2 * n)) *
+		     ((n - 3) * omegaM + 2 * (n - 2) * omegaR0);
 
 		Z.resize(n);
 		Dc.resize(n);
@@ -67,31 +72,37 @@ struct Cosmology {
 		update();
 	}
 
-	void setParameters(double h, double oM) {
+	void setParameters(double h, double oM, double oR0) {
 		H0 = h * 1e5 / Mpc;
 		omegaM = oM;
-		omegaL = 1 - oM;
+        omegaR0 = oR0;
 		update();
 	}
 };
 
-const int Cosmology::n = 1000;
+const int Cosmology::n = 1000; //**???????????????????**/
 const double Cosmology::zmin = 0.0001;
 const double Cosmology::zmax = 100;
 
 static Cosmology cosmology; // instance is created at runtime
 
-void setCosmologyParameters(double h, double oM) {
-	cosmology.setParameters(h, oM);
+void setCosmologyParameters(double h, double oM, double oR0) {
+	cosmology.setParameters(h, oM, oR0);
 }
 
 double hubbleRate(double z) {
-	return cosmology.H0
-			* sqrt(cosmology.omegaL + cosmology.omegaM * pow(1 + z, 3));
+    double n = cosmology.n;
+    double R0 = cosmology.R0;
+    double omegaM = cosmology.omegaM;
+    double omegaR0 = cosmology.omegaR0;
+
+	return sqrt((-2 * n * R0 / (3 * pow(3 - n, 2) * omegaM)) *
+	            ((n - 3) * omegaM * pow(1 + z, 3.0 / n) +
+	             2 * (n - 2) * omegaR0 * pow(1 + z, (n + 3) / n)));
 }
 
-double omegaL() {
-	return cosmology.omegaL;
+double omegaR0() {
+	return cosmology.omegaR0;
 }
 
 double omegaM() {
