@@ -74,11 +74,11 @@ struct Cosmology {
 		update();
 	}
 
-	void setParameters(double h, double oM, double oR0, n) {
+	void setParameters(double h, double oM, double oR0, double n) {
 		H0 = h * 1e5 / Mpc;
 		omegaM = oM;
         omegaR0 = oR0;
-        N0 = n
+        N0 = n;
 		update();
 	}
 };
@@ -89,7 +89,7 @@ const double Cosmology::zmax = 100;
 
 static Cosmology cosmology; // instance is created at runtime
 
-void setCosmologyParameters(double h, double oM, double oR0, n) {
+void setCosmologyParameters(double h, double oM, double oR0, double n) {
 	cosmology.setParameters(h, oM, oR0, n);
 }
 
