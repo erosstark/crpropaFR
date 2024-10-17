@@ -18,8 +18,9 @@ namespace crpropa {
  @param hubbleParameter	dimensionless Hubble parameter, default = 0.673
  @param omegaMatter		matter parameter, default = 0.315
  @param omegaRadiation			radiation parameter, default = 5.373*1e-5
+ @param n			model parameter, default = 1.4
  */
-void setCosmologyParameters(double hubbleParameter, double omegaMatter, double omegaRadiation);
+void setCosmologyParameters(double hubbleParameter, double omegaMatter, double omegaRadiation, double n);
 
 /**
  Hubble rate at given redshift
