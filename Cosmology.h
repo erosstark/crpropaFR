@@ -38,6 +38,8 @@ double omegaM();
 // Returns the hubble parameter
 double H0();
 
+double R0();
+
 /**
  Redshift of a comoving object at a given comoving distance to an observer at z = 0.
  d_comoving(z) = c/H0 * int_0^z dz' / E(z')
