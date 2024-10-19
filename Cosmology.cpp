@@ -15,9 +15,9 @@ namespace crpropa {
 struct Cosmology {
 	double H0; // Hubble parameter at z=0
 	double omegaM; // matter density parameter
-    double R0;
     double omegaR0; // radiation density parameter
     double N0; // model parameter, default = 1.4
+    double R0;
 
 	static const int n;
 	static const double zmin;
@@ -57,9 +57,9 @@ struct Cosmology {
 		H0 = 67.4 * 1000 * meter / second / Mpc; // default values
 		omegaM = 0.315;
         omegaR0 = 5.373*1e-5;
+        N0 = 1.4;
 		R0 = -(3 * pow(3 - N0, 2) * pow(H0, 2) * omegaM / 
         ( 2 * N0 * ((N0 - 3) * omegaM + 2 * (N0 - 2) * omegaR0))) ;
-        N0 = 1.4;
 
 		Z.resize(n);
 		Dc.resize(n);
@@ -94,13 +94,12 @@ void setCosmologyParameters(double h, double oM, double oR0, double n) {
 }
 
 double hubbleRate(double z) {
-    double n = cosmology.n;
-    double R0 = cosmology.R0;
     double omegaM = cosmology.omegaM;
     double omegaR0 = cosmology.omegaR0;
     double N0 = cosmology.N0;
+    double R0 = cosmology.R0;
 
-	return sqrt((-2 * N0 * R0 / (3 * pow(3 - N0, 2) * omegaM)) *
+    return sqrt((-2 * N0 * R0 / (3 * pow(3 - N0, 2) * omegaM)) *
 	            ((N0 - 3) * omegaM * pow(1 + z, 3.0 / N0) +
 	             2 * (N0 - 2) * omegaR0 * pow(1 + z, (N0 + 3) / N0)));
 }
@@ -115,6 +114,10 @@ double omegaM() {
 
 double H0() {
 	return cosmology.H0;
+}
+
+double R0() {
+    return cosmology.R0;
 }
 
 double comovingDistance2Redshift(double d) {
